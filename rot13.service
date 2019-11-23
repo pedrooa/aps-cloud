@@ -2,10 +2,12 @@
 Description=ROT13 demo service
 After=network.target
 StartLimitIntervalSec=0
+
 [Service]
 Type=simple
 Restart=always
-ExecStart=python3 ../../../aps-cloud/webserver.py
+User=ubuntu
+ExecStart=/usr/bin/env python3 ../../../aps-cloud/webserver.py
 
 [Install]
 WantedBy=multi-user.target

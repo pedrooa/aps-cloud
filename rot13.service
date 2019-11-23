@@ -5,7 +5,7 @@ StartLimitIntervalSec=0
 [Service]
 Type=simple
 Restart=always
-ExecStart=python3 ../../aps-cloud/webserver.py
+ExecStart=python3 ../../../aps-cloud/webserver.py
 
 [Install]
 WantedBy=multi-user.target

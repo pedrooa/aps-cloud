@@ -8,7 +8,7 @@ api = Api(app)
 
 with open('connector.txt') as f:
     eip = f.readline()
-
+eip = eip.rstrip()
 
 
 # eipConnector = str(os.environ['eipConnector'])

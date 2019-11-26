@@ -6,10 +6,10 @@ import requests
 app = Flask(__name__)
 api = Api(app)
 
-ObjRead= open('connector.txt', 'r')
-eip = ObjRead.read();
+with open('connector.txt') as f:
+    eip = f.readline()
 
-ObjRead.close()
+
 
 # eipConnector = str(os.environ['eipConnector'])
 

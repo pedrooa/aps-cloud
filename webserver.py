@@ -9,7 +9,7 @@ api = Api(app)
 eipConnector = str(os.environ['eipConnector'])
 
 url = "http://"+eipConnector+":8080/"
-
+print("URL: ",url)
 task_fields = {
     'id': fields.Integer,
     'title': fields.String,

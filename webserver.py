@@ -6,9 +6,14 @@ import requests
 app = Flask(__name__)
 api = Api(app)
 
-eipConnector = str(os.environ['eipConnector'])
+ObjRead= open('connector.txt', 'r')
+eip = ObjRead.read();
 
-url = "http://"+eipConnector+":8080/"
+ObjRead.close()
+
+# eipConnector = str(os.environ['eipConnector'])
+
+url = "http://"+eip+":8080/"
 print("URL: ",url)
 task_fields = {
     'id': fields.Integer,

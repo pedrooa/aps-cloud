@@ -51,7 +51,7 @@ class TaskAPI(Resource):
         return {'Updated task': tarefa}
 
     def delete(self, id):
-        r = requests.delete(api+"tarefa/"+_id)
+        r = requests.delete(url+"tarefa/"+_id)
         return {'result': True}
 
 class HealthcheckAPI(Resource):

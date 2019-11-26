@@ -1,30 +1,29 @@
 from flask import Flask
 from flask_restful import Api, Resource, reqparse, fields,marshal
 import os
+import pymongo
+
+
+
+eipConnector = str(os.environ['eipConnector'])
+
+mongoclient = pymongo.MongoClient(
+    "mongodb://"+eipConnector+":27017") 
+
+mongo = mongoclient['Projeto-Cloud']
+tarefasCollection = db['tarefas']
+
+
+task_fiels = {
+    'id': fields.Integer,
+    'title': fields.String,
+    'description': fields.String,
+    'done': fields.Boolean,
+    'uri': fields.Url('task')
+}
 
 app = Flask(__name__)
 api = Api(app)
-
-
-class Tarefas:
-    def __init__(self,_id,title, description = ""):
-        self._id = _id
-        self.title = title
-        self.description = description
-
-
-tasks = {
-	0:Tarefas(0,"acordar","conseguir"),
-	1:Tarefas(1,"cafe","ou baer mate"),
-	2:Tarefas(2,"Cloud","claudio")
-}
-
-def dictToJson(objectDict):
-    json_dict = {}
-    for key in objectDict:
-        task = objectDict[key].__dict__
-        json_dict[key] = task
-    return json_dict
 
 class TaskListAPI(Resource):
     def __init__(self):
@@ -36,13 +35,21 @@ class TaskListAPI(Resource):
         super(TaskListAPI, self).__init__()
 
     def get(self):
-        return {"tarefas":dictToJson(tasks)},200
-
+        tarefas = list(taskCollection.find())
+        return {'tarefas': [marshal(tarefa, task_fields) for tarefa in tarefas]}
 
     def post(self):
         args = self.reqparse.parse_args()
         task = Tarefas(len(tasks)+1,args['title'],args['description'])
-        tasks[len(tasks)+1] = task
+        task = {
+            'id': tasks[-1]['id'] + 1 if len(tasks) > 0 else 1,
+            'title': args['title'],
+            'description': args['description'],
+            'done': False
+        }
+        taskCollection.insert_one(
+            task
+        )
         return {'task': marshal(task, task_fields)}, 201
 
 class TaskAPI(Resource):
@@ -52,35 +59,30 @@ class TaskAPI(Resource):
         self.reqparse.add_argument('description', type = str, location = 'json')
         super(TaskAPI, self).__init__()
     def get(self, id):
-        task = [task for task in tasks if tasks[task]._id == id]
+        tasks = list(taskCollection.find())
+        task = [task for task in tasks if task['id'] == id]
         if len(task) == 0:
-            abort(404)
-        jsonTasks = dictToJson(tasks)
-        return {'task': jsonTasks[task[0]]}
+            return {'result': '404'}
+        return {'task': marshal(task[0], task_fields)}
+
 
     def put(self, id):
-        task = [task for task in tasks if tasks[task]._id == id]
+        tasks = list(taskCollection.find())
+        task = [task for task in tasks if task['id'] == id]
         if len(task) == 0:
-            abort(404)
-        task = task[0]
+            return {'result': '404'}
         args = self.reqparse.parse_args()
         for k, v in args.items():
-            print("{}, {}\n".format(k,v))
             if v is not None:
-                if k =="title":
-
-                    tasks[task].title = v
-                if k =="description":
-
-                    tasks[task].description = v
-        jsonTasks = dictToJson(tasks)
-        return {'Updated task': jsonTasks[task]}
+                taskCollection.update_one({"id": id}, {"$set": {k: v}})
+        return {'task': marshal(task, task_fields)}
 
     def delete(self, id):
-        task = [task for task in tasks if tasks[task]._id == id]
+        tasks = list(taskCollection.find())
+        task = [task for task in tasks if task['id'] == id]
         if len(task) == 0:
-            abort(404)
-        del tasks[task[0]]
+            return {'result': '404'}
+        taskCollection.delete_one({'id': id})
         return {'result': True}
 
 class HealthcheckAPI(Resource):

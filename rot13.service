@@ -1,13 +1,12 @@
 [Unit]
 Description=ROT13 demo service
-After=network.target
-StartLimitIntervalSec=0
-
-[Service]
-Type=simple
-Restart=always
-User=ubuntu
-ExecStart=/usr/bin/env python3 ../../../aps-cloud/webserver.py
-
 [Install]
 WantedBy=multi-user.target
+[Service]
+User=ubuntu
+PermissionsStartOnly=true
+ExecStart=/usr/bin/python3  aps-cloud/webserver.py
+TimeoutSec=600
+Restart=on-failure
+RuntimeDirectoryMode=755
+

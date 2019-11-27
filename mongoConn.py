@@ -4,8 +4,9 @@ import os
 import pymongo
 
 
-
-eipConnector = str(os.environ['eipConnector'])
+with open('connector.txt') as f:
+    eipConnector = f.readline()
+eipConnector = eipConnector.rstrip()
 
 mongoclient = pymongo.MongoClient(
     "mongodb://"+eipConnector+":27017") 

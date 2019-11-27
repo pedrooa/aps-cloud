@@ -55,8 +55,11 @@ class TaskAPI(Resource):
         super(TaskAPI, self).__init__()
     def get(self, id):
         tasks = list(taskCollection.find())
-        task = [task for task in tasks if task['id'] == id]
-        if len(task) == 0:
+        task = None
+        for i in tasks:
+            if i['id']==id:
+                task = i
+        if task == None:
             return {'result': '404'}
         return {'task': marshal(task[0], task_fields)}
 

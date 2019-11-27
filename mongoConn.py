@@ -3,19 +3,15 @@ from flask_restful import Api, Resource, reqparse, fields,marshal
 import os
 import pymongo
 
+print(os.environ['IPmongodb'])
 
-with open('connector.txt') as f:
-    eipConnector = f.readline()
-eipConnector = eipConnector.rstrip()
+IPmongodb = str(os.environ['IPmongodb'])
 
-mongoclient = pymongo.MongoClient(
-    "mongodb://"+eipConnector+":27017") 
+client = pymongo.MongoClient("mongodb://"+IPmongodb+":27017")
+db = client['Projeto-Cloud']
+taskCollection = db['tasks']
 
-mongo = mongoclient['Projeto-Cloud']
-tarefasCollection = db['tarefas']
-
-
-task_fiels = {
+task_fiedls = {
     'id': fields.Integer,
     'title': fields.String,
     'description': fields.String,
@@ -48,9 +44,7 @@ class TaskListAPI(Resource):
             'description': args['description'],
             'done': False
         }
-        taskCollection.insert_one(
-            task
-        )
+        taskCollection.insert_one(task)
         return {'task': marshal(task, task_fields)}, 201
 
 class TaskAPI(Resource):
@@ -69,19 +63,26 @@ class TaskAPI(Resource):
 
     def put(self, id):
         tasks = list(taskCollection.find())
-        task = [task for task in tasks if task['id'] == id]
-        if len(task) == 0:
+        task = None
+        for i in tasks:
+            if i['id']==id:
+                task = i
+        if task == None:
             return {'result': '404'}
         args = self.reqparse.parse_args()
-        for k, v in args.items():
-            if v is not None:
-                taskCollection.update_one({"id": id}, {"$set": {k: v}})
+        for key, value in args.items():
+            if value is not None:
+                taskCollection.update_one({"id": id}, {"$set": {key: value}})
         return {'task': marshal(task, task_fields)}
 
     def delete(self, id):
         tasks = list(taskCollection.find())
-        task = [task for task in tasks if task['id'] == id]
-        if len(task) == 0:
+
+        task = None
+        for i in tasks:
+            if i['id']==id:
+                task = i
+        if task == None:
             return {'result': '404'}
         taskCollection.delete_one({'id': id})
         return {'result': True}
@@ -99,6 +100,7 @@ api.add_resource(HealthcheckAPI, '/healthcheck', endpoint = 'healthcheck')
 if __name__ == '__main__':
 
     app.run( host = os.getenv('LISTEN','0.0.0.0'),port=int(os.getenv('PORT','8080')),debug=True)
+
 
 
 

@@ -5,7 +5,7 @@ WantedBy=multi-user.target
 [Service]
 User=ubuntu
 PermissionsStartOnly=true
-ExecStart=/usr/bin/python3  aps-cloud/webserver.py
+ExecStart=/usr/bin/python3  /aps-cloud/webserver.py
 TimeoutSec=600
 Restart=on-failure
 RuntimeDirectoryMode=755

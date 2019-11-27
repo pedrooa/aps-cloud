@@ -11,7 +11,7 @@ client = pymongo.MongoClient("mongodb://"+IPmongodb+":27017")
 db = client['Projeto-Cloud']
 taskCollection = db['tasks']
 
-task_fiedls = {
+task_fields = {
     'id': fields.Integer,
     'title': fields.String,
     'description': fields.String,

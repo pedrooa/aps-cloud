@@ -3,12 +3,10 @@ from flask_restful import Api, Resource, reqparse, fields,marshal
 import os
 import pymongo
 
-print(os.environ['IPmongodb'])
 
 IPmongodb = str(os.environ['IPmongodb'])
-
 client = pymongo.MongoClient("mongodb://"+IPmongodb+":27017")
-db = client['Projeto-Cloud']
+db = client['Cloud']
 taskCollection = db['tasks']
 
 task_fields = {
